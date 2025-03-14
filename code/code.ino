@@ -1,8 +1,8 @@
 #include <Ps3Controller.h>
 
 int enableRightMotor = 22;
-int rightMotorPin1 = 16;
-int rightMotorPin2 = 17;
+int rightMotorPin1 = 32;
+int rightMotorPin2 = 33;
 
 int enableLeftMotor = 23;
 int leftMotorPin1 = 18;
@@ -89,17 +89,31 @@ void loop()
   int rightMotorSpeed = 0;
   int leftMotorSpeed = 0;
 
-  if (Ps3.data.button.up || Ps3.data.button.cross || Ps3.data.button.r2)
+  if (Ps3.data.button.up || Ps3.data.button.cross)
   {
     Serial.println("Acelerando!");
     rightMotorSpeed = MAX_MOTOR_SPEED;
     leftMotorSpeed = MAX_MOTOR_SPEED;
   }
-  else if (Ps3.data.button.down || Ps3.data.button.l2) 
+  else if (Ps3.data.analog.button.r2 > 0)
+  {
+    rightMotorSpeed = Ps3.data.analog.button.r2;
+    leftMotorSpeed = Ps3.data.analog.button.r2;
+    Serial.print("Pressão no botão R2: ");
+    Serial.println(Ps3.data.analog.button.r2);
+  }
+  else if (Ps3.data.button.down) 
   {
     Serial.println("Ré!");
     rightMotorSpeed = -MAX_MOTOR_SPEED;
     leftMotorSpeed = -MAX_MOTOR_SPEED;
+  }
+  else if (Ps3.data.analog.button.l2)
+  {
+    rightMotorSpeed = -Ps3.data.analog.button.l2;
+    leftMotorSpeed = -Ps3.data.analog.button.l2;
+    Serial.print("Pressão no botão L2: ");
+    Serial.println(Ps3.data.analog.button.l2);
   }
 
   if (Ps3.data.button.left)
@@ -114,6 +128,13 @@ void loop()
     Serial.println("Direita!");
     rightMotorSpeed = -MAX_MOTOR_SPEED;
     leftMotorSpeed = MAX_MOTOR_SPEED;
+  }
+
+  if (Ps3.data.button.circle || Ps3.data.button.r1)
+  {
+    Serial.println("Freio!");
+    rightMotorSpeed = 0;
+    leftMotorSpeed = 0;
   }
 
   rotateMotor(rightMotorSpeed, leftMotorSpeed);
