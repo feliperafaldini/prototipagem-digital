@@ -36,15 +36,29 @@ void moveForward(int speed) {
 }
 
 void moveForwardWithTurning(int speedY, int speedX) {
-  int baseSpeed = map(abs(speedY), 0, 127, 0, 255);
+  int magnitude = sqrt((speedX * speedX) + (speedY * speedY));
+  if (magnitude > 127) {
+    speedX = (speedX * 127) / magnitude;
+    speedY = (speedY * 127) / magnitude;
+  }
+  int baseSpeed = map(sqrt((speedX * speedX) + (speedY * speedY)), 0, 127, 0, 255);
 
   int rightSpeed = baseSpeed;
   int leftSpeed = baseSpeed;
 
-  if (speedX < 0) {
-    rightSpeed  = map(speedX, -127, 0, baseSpeed/2, baseSpeed);
-  } else if (speedX > 0) {
-    leftSpeed = map(speedX, 0, 127, baseSpeed, baseSpeed/2);
+  if (speedX < -20) {
+    rightSpeed = map(speedX, -127, -20, baseSpeed * 0.4, baseSpeed);
+  } else if (speedX < -50) {
+    rightSpeed = map(speedX, -127, -20, baseSpeed * 0.2, baseSpeed);
+  } else if (speedX < -100) {
+    rightSpeed = map(speedX, -127, -20, baseSpeed * 0.1, baseSpeed);
+  }
+  if (speedX > 20) {
+    leftSpeed = map(speedX, 20, 127, baseSpeed, baseSpeed * 0.4);
+  } else if (speedX > 50) {
+    leftSpeed = map(speedX, 20, 127, baseSpeed, baseSpeed * 0.2);
+  } else if (speedX > 100) {
+    leftSpeed = map(speedX, 20, 127, baseSpeed, baseSpeed * 0.1);
   }
 
   digitalWrite(rightMotorPin1, HIGH);
@@ -54,6 +68,17 @@ void moveForwardWithTurning(int speedY, int speedX) {
 
   analogWrite(enableRightMotor, rightSpeed);
   analogWrite(enableLeftMotor, leftSpeed);
+
+  Serial.print("speedX: ");
+  Serial.print(speedX);
+  Serial.print(", speedY: ");
+  Serial.print(speedY);
+  Serial.print(", baseSpeed: ");
+  Serial.print(baseSpeed);
+  Serial.print(", rightSpeed: ");
+  Serial.print(rightSpeed);
+  Serial.print(", leftSpeed: ");
+  Serial.println(leftSpeed);
 }
 
 void moveBackward(int speed) {
@@ -67,15 +92,29 @@ void moveBackward(int speed) {
 }
 
 void moveBackwardWithTurning(int speedY, int speedX) {
-  int baseSpeed = map(abs(speedY), 0, 127, 0, 255);
+  int magnitude = sqrt((speedX * speedX) + (speedY * speedY));
+  if (magnitude > 127) {
+    speedX = (speedX * 127) / magnitude;
+    speedY = (speedY * 127) / magnitude;
+  }
+  int baseSpeed = map(sqrt((speedX * speedX) + (speedY * speedY)), 0, 127, 0, 255);
 
   int rightSpeed = baseSpeed;
   int leftSpeed = baseSpeed;
 
-  if (speedX < 0) {
-    rightSpeed = map(speedX, -127, 0, baseSpeed/2, baseSpeed);
-  } else if (speedX > 0) {
-    leftSpeed = map(speedX, 0, 127, baseSpeed, baseSpeed/2);
+  if (speedX < -20) {
+    leftSpeed = map(speedX, -127, -20, baseSpeed * 0.4, baseSpeed);
+  } else if (speedX < -50) {
+    leftSpeed = map(speedX, -127, -20, baseSpeed * 0.2, baseSpeed)
+  } else if (speedX < -100) {
+    leftSpeed = map(speedX, -127, -20, baseSpeed * 0.1, baseSpeed)
+  }
+  if (speedX > 20) {
+    rightSpeed = map(speedX, 20, 127, baseSpeed, baseSpeed * 0.4);
+  } else if (speedX > 50) {
+    rightSpeed = map(speedX, 20, 127, baseSpeed, baseSpeed * 0.2);
+  } else if (speedX > 100) {
+    rightSpeed = map(speedX, 20, 127, baseSpeed, baseSpeed * 0.1);
   }
 
   digitalWrite(rightMotorPin1, LOW);
@@ -123,18 +162,16 @@ void loop() {
     if (millis() - lastUpdate > 50) {
       lastUpdate = millis();
     
-      Serial.print("Conectado ao controle!");
-
-      if (ps5.LStickY() > 0) {
+      if (ps5.LStickY() > 10) {
         currentCommand = 1;
       }
       else if (ps5.Up() || ps5.Cross()) {
         currentCommand = 2;
       }
-      else if (ps5.R2()) {
+      else if (ps5.R2() > 0) {
         currentCommand = 3;
       }
-      else if (ps5.LStickY() < 0) {
+      else if (ps5.LStickY() < -10) {
         currentCommand = 4;
       }
       else if (ps5.Down() || ps5.Square()) {
