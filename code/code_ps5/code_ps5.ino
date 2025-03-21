@@ -67,7 +67,7 @@ void moveBackward(int speed) {
 }
 
 void moveBackwardWithTurning(int speedY, int speedX) {
-  int baseSpeed = map(abs(speedY), 0, 127, 0, 255);
+  int baseSpeed = map(sqrt((speedX**2)+(speedY**2)), 0, 127, 0, 255);
 
   int rightSpeed = baseSpeed;
   int leftSpeed = baseSpeed;
