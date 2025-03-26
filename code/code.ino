@@ -1,12 +1,12 @@
 #include <Ps3Controller.h>
 
-int enableRightMotor = 22;
-int rightMotorPin1 = 32;
-int rightMotorPin2 = 33;
+int enableRightMotor = 5;
+int rightMotorPin1 = 7;
+int rightMotorPin2 = 6;
 
-int enableLeftMotor = 23;
-int leftMotorPin1 = 18;
-int leftMotorPin2 = 19;
+int enableLeftMotor = 9;
+int leftMotorPin1 = 4;
+int leftMotorPin2 = 3;
 
 int motorSpeed = 255;
 
@@ -25,6 +25,56 @@ void setup() {
   Ps3.begin("90:90:69:00:00:00");
   Serial.begin(115200);
   Serial.println("Pronto para conectar o controle PS3...");
+}
+
+void moveForward(int speed) {
+  digitalWrite(rightMotorPin1, HIGH);
+  digitalWrite(rightMotorPin2, LOW);
+  digitalWrite(leftMotorPin1, HIGH);
+  digitalWrite(leftMotorPin2, LOW);
+
+  analogWrite(enableRightMotor, speed);
+  analogWrite(enableLeftMotor, speed);
+}
+
+void moveBackward(int speed) {
+  digitalWrite(rightMotorPin1, LOW);
+  digitalWrite(rightMotorPin2, HIGH);
+  digitalWrite(leftMotorPin1, LOW);
+  digitalWrite(leftMotorPin2, HIGH);
+
+  analogWrite(enableRightMotor, speed);
+  analogWrite(enableLeftMotor, speed);
+}
+
+void turnLeft() {
+  digitalWrite(rightMotorPin1, HIGH);
+  digitalWrite(rightMotorPin2, LOW);
+  digitalWrite(leftMotorPin1, LOW);
+  digitalWrite(leftMotorPin2, HIGH);
+
+  analogWrite(enableRightMotor, motorSpeed);
+  analogWrite(enableLeftMotor, motorSpeed);
+}
+
+void turnRight() {
+  digitalWrite(rightMotorPin1, LOW);
+  digitalWrite(rightMotorPin2, HIGH);
+  digitalWrite(leftMotorPin1, HIGH);
+  digitalWrite(leftMotorPin2, LOW);
+
+  analogWrite(enableRightMotor, motorSpeed);
+  analogWrite(enableLeftMotor, motorSpeed);
+}
+
+void stopMotors() {
+  digitalWrite(rightMotorPin1, LOW);
+  digitalWrite(rightMotorPin2, LOW);
+  digitalWrite(leftMotorPin1, LOW);
+  digitalWrite(leftMotorPin2, LOW);
+
+  analogWrite(enableRightMotor, 0);
+  analogWrite(enableLeftMotor, 0);
 }
 
 void loop() {
@@ -57,68 +107,33 @@ void loop() {
 
       switch (currentCommand) {
         case 1:
-          digitalWrite(rightMotorPin1, HIGH);
-          digitalWrite(rightMotorPin2, LOW);
-          digitalWrite(leftMotorPin1, HIGH);
-          digitalWrite(leftMotorPin2, LOW);
-          analogWrite(enableRightMotor, motorSpeed);
-          analogWrite(enableLeftMotor, motorSpeed);
+          moveForward(motorSpeed);
           Serial.println("Movendo para frente");
           break;
         case 2:
-          digitalWrite(rightMotorPin1, HIGH);
-          digitalWrite(rightMotorPin2, LOW);
-          digitalWrite(leftMotorPin1, HIGH);
-          digitalWrite(leftMotorPin2, LOW);
-          analogWrite(enableRightMotor, Ps3.data.analog.button.r2);
-          analogWrite(enableLeftMotor, Ps3.data.analog.button.r2);
+          moveForward(Ps3.data.analog.button.r2);
           Serial.print("R2 pressionado com valor: ");
           Serial.println(Ps3.data.analog.button.r2);
           break;
         case 3:
-          digitalWrite(rightMotorPin1, LOW);
-          digitalWrite(rightMotorPin2, HIGH);
-          digitalWrite(leftMotorPin1, LOW);
-          digitalWrite(leftMotorPin2, HIGH);
-          analogWrite(enableRightMotor, motorSpeed);
-          analogWrite(enableLeftMotor, motorSpeed);
+          moveBackward(motorSpeed);
           Serial.println("Movendo para trás");
           break;
         case 4:
-          digitalWrite(rightMotorPin1, LOW);
-          digitalWrite(rightMotorPin2, HIGH);
-          digitalWrite(leftMotorPin1, LOW);
-          digitalWrite(leftMotorPin2, HIGH);
-          analogWrite(enableRightMotor, Ps3.data.analog.button.l2);
-          analogWrite(enableLeftMotor, Ps3.data.analog.button.l2);
+          moveBackward(Ps3.data.analog.button.l2);
           Serial.print("L2 pressionado com valor: ");
           Serial.println(Ps3.data.analog.button.l2);
           break;
         case 5:
-          digitalWrite(rightMotorPin1, HIGH);
-          digitalWrite(rightMotorPin2, LOW);
-          digitalWrite(leftMotorPin1, LOW);
-          digitalWrite(leftMotorPin2, HIGH);
-          analogWrite(enableRightMotor, motorSpeed);
-          analogWrite(enableLeftMotor, motorSpeed);
+          turnLeft(motorSpeed);
           Serial.println("Virando para a esquerda");
           break;
         case 6:
-          digitalWrite(rightMotorPin1, LOW);
-          digitalWrite(rightMotorPin2, HIGH);
-          digitalWrite(leftMotorPin1, HIGH);
-          digitalWrite(leftMotorPin2, LOW);
-          analogWrite(enableRightMotor, motorSpeed);
-          analogWrite(enableLeftMotor, motorSpeed);
+          turnRight(motorSpeed);
           Serial.println("Virando para a direita");
           break;
         default:
-          digitalWrite(rightMotorPin1, LOW);
-          digitalWrite(rightMotorPin2, LOW);
-          digitalWrite(leftMotorPin1, LOW);
-          digitalWrite(leftMotorPin2, LOW);
-          analogWrite(enableRightMotor, 0);
-          analogWrite(enableLeftMotor, 0);
+          stopMotors();
           Serial.println("Parado");
           break;
       }
