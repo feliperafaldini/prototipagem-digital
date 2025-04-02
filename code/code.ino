@@ -125,11 +125,11 @@ void loop() {
           Serial.println(Ps3.data.analog.button.l2);
           break;
         case 5:
-          turnLeft(motorSpeed);
+          turnLeft();
           Serial.println("Virando para a esquerda");
           break;
         case 6:
-          turnRight(motorSpeed);
+          turnRight();
           Serial.println("Virando para a direita");
           break;
         default:
